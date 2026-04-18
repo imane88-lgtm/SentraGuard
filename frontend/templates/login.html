@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SentraGuard — Login</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: #0a0e1a;
+      color: #c9d1e0;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .logo svg { width: 56px; height: 56px; margin-bottom: 12px; }
+    .logo-text {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #00d4ff;
+      letter-spacing: 4px;
+    }
+    .logo-sub {
+      font-size: 0.65rem;
+      color: #4a6fa5;
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: #0d1225;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 32px;
+    }
+
+    .card-title {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: #4a6fa5;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      color: #4a6fa5;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .field input {
+      width: 100%;
+      background: #0a0e1a;
+      border: 1px solid #1e3a5f;
+      border-radius: 6px;
+      padding: 12px 14px;
+      color: #c9d1e0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .field input:focus { border-color: #00d4ff; }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: #00d4ff;
+      color: #0a0e1a;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #00b8d9; }
+    .btn:disabled { background: #1e3a5f; color: #4a6fa5; cursor: not-allowed; }
+
+    .btn-outline {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      color: #4a6fa5;
+      border: 1px solid #1e3a5f;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: #00d4ff; color: #00d4ff; }
+
+    .message {
+      margin-top: 16px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      text-align: center;
+      display: none;
+    }
+    .message.error { background: #3a0a0a; color: #ff4444; border: 1px solid #ff4444; }
+    .message.success { background: #0a3a1a; color: #00ff88; border: 1px solid #00ff88; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #1e3a5f;
+      margin: 20px 0;
+    }
+
+    .tab-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 6px;
+      border: 1px solid #1e3a5f;
+      color: #4a6fa5;
+      transition: all 0.2s;
+    }
+    .tab.active { border-color: #00d4ff; color: #00d4ff; background: #0a1e35; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">
+    <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="18,2 34,10 34,26 18,34 2,26 2,10"
+        fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+      <polygon points="18,7 29,13 29,23 18,29 7,23 7,13"
+        fill="none" stroke="#00d4ff" stroke-width="0.8" opacity="0.5"/>
+      <circle cx="18" cy="18" r="4" fill="#00d4ff" opacity="0.9"/>
+      <line x1="18" y1="2"  x2="18" y2="7"  stroke="#00d4ff" stroke-width="1"/>
+      <line x1="18" y1="29" x2="18" y2="34" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="2"  y1="10" x2="7"  y2="13" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="29" y1="23" x2="34" y2="26" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="34" y1="10" x2="29" y2="13" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="2"  y1="26" x2="7"  y2="23" stroke="#00d4ff" stroke-width="1"/>
+    </svg>
+    <div class="logo-text">SENTRAGUARD</div>
+    <div class="logo-sub">MRINO — SECURITY OPERATIONS</div>
+  </div>
+
+  <div class="card">
+    <div class="tab-row">
+      <div class="tab active" id="tab-login" onclick="switchTab('login')">Login</div>
+      <div class="tab" id="tab-register" onclick="switchTab('register')">Register</div>
+    </div>
+
+    <!-- Login Form -->
+    <div id="form-login">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="login-user" placeholder="Enter username" autocomplete="off"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="Enter password"/>
+      </div>
+      <button class="btn" id="login-btn" onclick="doLogin()">Access System</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="form-register" style="display:none">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="reg-user" placeholder="Min 3 characters" autocomplete="off"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="reg-pass" placeholder="Min 6 characters"/>
+      </div>
+      <button class="btn" id="reg-btn" onclick="doRegister()">Create Account</button>
+    </div>
+
+    <div class="message" id="msg"></div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('tab-login').className = 'tab' + (tab === 'login' ? ' active' : '');
+  document.getElementById('tab-register').className = 'tab' + (tab === 'register' ? ' active' : '');
+  showMsg('', '');
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'message ' + type;
+  el.style.display = text ? 'block' : 'none';
+}
+
+async function doLogin() {
+  const btn = document.getElementById('login-btn');
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value;
+  if (!username || !password) return showMsg('Fill all fields', 'error');
+
+  btn.disabled = true;
+  btn.textContent = 'Authenticating...';
+
+  const r = await fetch('/api/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username, password})
+  });
+  const d = await r.json();
+
+  if (r.ok) {
+    showMsg('Access granted — redirecting...', 'success');
+    setTimeout(() => window.location.href = '/', 800);
+  } else {
+    const attempts = d.detail?.remaining;
+    const msg = d.error + (attempts !== undefined ? ` (${attempts} attempts left)` : '');
+    showMsg(msg, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Access System';
+  }
+}
+
+async function doRegister() {
+  const btn = document.getElementById('reg-btn');
+  const username = document.getElementById('reg-user').value.trim();
+  const password = document.getElementById('reg-pass').value;
+  if (!username || !password) return showMsg('Fill all fields', 'error');
+
+  btn.disabled = true;
+  const r = await fetch('/api/register', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username, password})
+  });
+  const d = await r.json();
+
+  if (r.ok) {
+    showMsg('Account created — switching to login...', 'success');
+    setTimeout(() => switchTab('login'), 1200);
+  } else {
+    showMsg(d.error, 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Create Account';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const tab = document.getElementById('tab-login').classList.contains('active');
+    tab ? doLogin() : doRegister();
+  }
+});
+</script>
+</body>
+</html>

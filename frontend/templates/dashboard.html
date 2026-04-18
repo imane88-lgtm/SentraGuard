@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SentraGuard — SOC Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0e1a; color: #c9d1e0; font-family: 'Courier New', monospace; }
+
+    header {
+      background: #0d1225;
+      border-bottom: 1px solid #1e3a5f;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo svg { width: 36px; height: 36px; }
+    .logo-text { font-size: 1.3rem; font-weight: bold; color: #00d4ff; letter-spacing: 2px; }
+    .logo-sub { font-size: 0.65rem; color: #4a6fa5; letter-spacing: 3px; }
+    .status-bar { font-size: 0.75rem; color: #4a6fa5; }
+    .status-bar span { color: #00ff88; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 20px 28px;
+    }
+    .card {
+      background: #0d1225;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .card-title {
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: #4a6fa5;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .card-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00d4ff;
+    }
+    .card-value.warning { color: #ffaa00; }
+    .card-value.critical { color: #ff4444; }
+    .card-value.ok { color: #00ff88; }
+
+    .bar-bg {
+      background: #1a2740;
+      border-radius: 4px;
+      height: 8px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: #00d4ff;
+      transition: width 0.5s ease;
+    }
+    .bar-fill.warning { background: #ffaa00; }
+    .bar-fill.critical { background: #ff4444; }
+
+    .section {
+      padding: 0 28px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .panel {
+      background: #0d1225;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .panel-title {
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: #4a6fa5;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #1e3a5f;
+      padding-bottom: 8px;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #111827;
+      font-size: 0.8rem;
+    }
+    .badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .badge.info { background: #0a3a5c; color: #00d4ff; }
+    .badge.warning { background: #3a2a00; color: #ffaa00; }
+    .badge.critical { background: #3a0a0a; color: #ff4444; }
+
+    .proc-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 0.78rem;
+      border-bottom: 1px solid #111827;
+    }
+    .proc-name { color: #8ab4d4; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .proc-cpu { color: #00ff88; }
+
+    .ids-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 0;
+      font-size: 0.82rem;
+      border-bottom: 1px solid #111827;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #00ff88;
+    }
+    .dot.alert { background: #ff4444; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.65rem;
+      color: #1e3a5f;
+      border-top: 1px solid #1e3a5f;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="18,2 34,10 34,26 18,34 2,26 2,10"
+        fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+      <polygon points="18,7 29,13 29,23 18,29 7,23 7,13"
+        fill="none" stroke="#00d4ff" stroke-width="0.8" opacity="0.5"/>
+      <circle cx="18" cy="18" r="4" fill="#00d4ff" opacity="0.9"/>
+      <line x1="18" y1="2"  x2="18" y2="7"  stroke="#00d4ff" stroke-width="1"/>
+      <line x1="18" y1="29" x2="18" y2="34" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="2"  y1="10" x2="7"  y2="13" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="29" y1="23" x2="34" y2="26" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="34" y1="10" x2="29" y2="13" stroke="#00d4ff" stroke-width="1"/>
+      <line x1="2"  y1="26" x2="7"  y2="23" stroke="#00d4ff" stroke-width="1"/>
+    </svg>
+    <div>
+      <div class="logo-text">SENTRAGUARD</div>
+      <div class="logo-sub">MRINO — SOC DASHBOARD</div>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:20px;">
+    <div class="status-bar">
+      SYSTEM: <span id="sys-status">ONLINE</span> &nbsp;|&nbsp;
+      USER: <span id="session-user" style="color:#00d4ff">--</span> &nbsp;|&nbsp;
+      <span id="last-update">--</span>
+    </div>
+    <button onclick="doLogout()" style="
+      background:transparent; border:1px solid #1e3a5f;
+      color:#4a6fa5; padding:6px 14px; border-radius:6px;
+      font-family:'Courier New',monospace; font-size:0.7rem;
+      letter-spacing:2px; cursor:pointer; text-transform:uppercase;">
+      LOGOUT
+    </button>
+  </div>
+</header>
+
+<!-- Metric Cards -->
+<div class="grid" style="grid-template-columns: repeat(3,1fr);">
+  <div class="card">
+    <div class="card-title">CPU Usage</div>
+    <div class="card-value" id="cpu-val">--%</div>
+    <div class="bar-bg"><div class="bar-fill" id="cpu-bar" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">RAM Usage</div>
+    <div class="card-value" id="ram-val">--%</div>
+    <div class="bar-bg"><div class="bar-fill" id="ram-bar" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Disk Usage</div>
+    <div class="card-value" id="disk-val">--%</div>
+    <div class="bar-bg"><div class="bar-fill" id="disk-bar" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Network Sent</div>
+    <div class="card-value ok" id="net-sent">-- MB</div>
+    <div style="font-size:0.72rem; color:#4a6fa5; margin-top:6px;">Recv: <span id="net-recv" style="color:#00d4ff">-- MB</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Total Alerts</div>
+    <div class="card-value" id="alert-total">--</div>
+    <div style="font-size:0.75rem; margin-top:8px;">
+      <span style="color:#00d4ff" id="a-info">0 info</span> &nbsp;
+      <span style="color:#ffaa00" id="a-warn">0 warn</span> &nbsp;
+      <span style="color:#ff4444" id="a-crit">0 crit</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">IDS Engine</div>
+    <div class="card-value ok" id="ids-engine-status">ACTIVE</div>
+    <div style="font-size:0.72rem; color:#4a6fa5; margin-top:6px;">
+      Brute Force + Anomaly
+    </div>
+  </div>
+</div>
+<!-- Panels -->
+<div class="section">
+  <div class="panel">
+    <div class="panel-title">Recent Alerts</div>
+    <div id="alerts-list">Loading...</div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Top Processes</div>
+    <div id="proc-list">Loading...</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="panel">
+    <div class="panel-title">IDS — Anomaly Status</div>
+    <div id="ids-anomaly">Loading...</div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">IDS — Blocked IPs</div>
+    <div id="ids-blocked">Loading...</div>
+  </div>
+</div>
+<!-- Encryption Panel -->
+<div style="padding: 0 28px 20px;">
+  <div class="panel">
+    <div class="panel-title">File Encryption — AES-256-GCM</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+      <!-- Encrypt -->
+      <div>
+        <div style="font-size:0.7rem; color:#4a6fa5; letter-spacing:2px; margin-bottom:10px;">ENCRYPT FILE</div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:0.65rem; color:#4a6fa5; letter-spacing:1px;">FILE PATH</label>
+          <input id="enc-path" type="text" placeholder="/path/to/file.txt"
+            style="width:100%; background:#0a0e1a; border:1px solid #1e3a5f;
+            border-radius:6px; padding:10px; color:#c9d1e0;
+            font-family:'Courier New',monospace; font-size:0.82rem;
+            margin-top:4px; outline:none;"/>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:0.65rem; color:#4a6fa5; letter-spacing:1px;">KEY NAME</label>
+          <input id="enc-key" type="text" placeholder="default"
+            style="width:100%; background:#0a0e1a; border:1px solid #1e3a5f;
+            border-radius:6px; padding:10px; color:#c9d1e0;
+            font-family:'Courier New',monospace; font-size:0.82rem;
+            margin-top:4px; outline:none;"/>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button onclick="encryptFile()" style="
+            flex:1; padding:9px; background:#00d4ff; color:#0a0e1a;
+            border:none; border-radius:6px; font-family:'Courier New',monospace;
+            font-size:0.75rem; font-weight:bold; letter-spacing:2px;
+            cursor:pointer; text-transform:uppercase;">ENCRYPT</button>
+          <button onclick="genKey()" style="
+            flex:1; padding:9px; background:transparent; color:#4a6fa5;
+            border:1px solid #1e3a5f; border-radius:6px;
+            font-family:'Courier New',monospace; font-size:0.75rem;
+            letter-spacing:2px; cursor:pointer; text-transform:uppercase;">GEN KEY</button>
+        </div>
+        <div id="enc-result" style="margin-top:10px; font-size:0.75rem; color:#00ff88; min-height:20px;"></div>
+      </div>
+
+      <!-- Decrypt -->
+      <div>
+        <div style="font-size:0.7rem; color:#4a6fa5; letter-spacing:2px; margin-bottom:10px;">DECRYPT FILE</div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:0.65rem; color:#4a6fa5; letter-spacing:1px;">ENCRYPTED FILE PATH</label>
+          <input id="dec-path" type="text" placeholder="/path/to/file.txt.enc"
+            style="width:100%; background:#0a0e1a; border:1px solid #1e3a5f;
+            border-radius:6px; padding:10px; color:#c9d1e0;
+            font-family:'Courier New',monospace; font-size:0.82rem;
+            margin-top:4px; outline:none;"/>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:0.65rem; color:#4a6fa5; letter-spacing:1px;">KEY NAME</label>
+          <input id="dec-key" type="text" placeholder="default"
+            style="width:100%; background:#0a0e1a; border:1px solid #1e3a5f;
+            border-radius:6px; padding:10px; color:#c9d1e0;
+            font-family:'Courier New',monospace; font-size:0.82rem;
+            margin-top:4px; outline:none;"/>
+        </div>
+        <button onclick="decryptFile()" style="
+          width:100%; padding:9px; background:transparent; color:#00d4ff;
+          border:1px solid #00d4ff; border-radius:6px;
+          font-family:'Courier New',monospace; font-size:0.75rem;
+          font-weight:bold; letter-spacing:2px;
+          cursor:pointer; text-transform:uppercase;">DECRYPT</button>
+        <div id="dec-result" style="margin-top:10px; font-size:0.75rem; color:#00ff88; min-height:20px;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>SENTRAGUARD MRINO &copy; 2025 — LOCAL SECURITY OPERATIONS CENTER</footer>
+
+<script src="/static/dashboard.js"></script>
+<script src="/static/encryption.js"></script></body>
+</html>
