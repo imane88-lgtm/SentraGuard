@@ -5,152 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SentraGuard — Login</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: #0a0e1a;
-      color: #c9d1e0;
-      font-family: 'Courier New', monospace;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #13111a;
+    color: #e2e0e9;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .container { width: 100%; max-width: 420px; padding: 20px; }
+  .logo { text-align: center; margin-bottom: 36px; }
+  .logo svg { width: 56px; height: 56px; margin-bottom: 12px; }
+  .logo-text { font-size: 1.6rem; font-weight: 700; color: #a78bfa; letter-spacing: 4px; }
+  .logo-sub { font-size: 0.6rem; color: #6b5fa0; letter-spacing: 3px; margin-top: 4px; }
 
-    .container {
-      width: 100%;
-      max-width: 420px;
-      padding: 20px;
-    }
+  .card {
+    background: #1a1726;
+    border: 1px solid #2d2640;
+    border-radius: 12px;
+    padding: 32px;
+  }
+  .card-title {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: #6b5fa0;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    text-align: center;
+  }
 
-    .logo {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .logo svg { width: 56px; height: 56px; margin-bottom: 12px; }
-    .logo-text {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #00d4ff;
-      letter-spacing: 4px;
-    }
-    .logo-sub {
-      font-size: 0.65rem;
-      color: #4a6fa5;
-      letter-spacing: 3px;
-      margin-top: 4px;
-    }
+  .tab-row { display: flex; gap: 8px; margin-bottom: 24px; }
+  .tab {
+    flex: 1; padding: 8px; text-align: center;
+    font-size: 0.7rem; letter-spacing: 2px;
+    text-transform: uppercase; cursor: pointer;
+    border-radius: 6px; border: 1px solid #2d2640;
+    color: #6b5fa0; transition: all 0.2s;
+  }
+  .tab.active { border-color: #7c3aed; color: #a78bfa; background: #1e1b4b; }
 
-    .card {
-      background: #0d1225;
-      border: 1px solid #1e3a5f;
-      border-radius: 10px;
-      padding: 32px;
-    }
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block; font-size: 0.68rem;
+    letter-spacing: 2px; color: #6b5fa0;
+    margin-bottom: 6px; text-transform: uppercase;
+  }
+  .field input {
+    width: 100%; background: #13111a;
+    border: 1px solid #2d2640; border-radius: 6px;
+    padding: 12px 14px; color: #e2e0e9;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.9rem; outline: none; transition: border 0.2s;
+  }
+  .field input:focus { border-color: #7c3aed; }
 
-    .card-title {
-      font-size: 0.7rem;
-      letter-spacing: 3px;
-      color: #4a6fa5;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-      text-align: center;
-    }
+  .btn {
+    width: 100%; padding: 13px;
+    background: #7c3aed; color: #fff;
+    border: none; border-radius: 6px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    letter-spacing: 2px; cursor: pointer;
+    text-transform: uppercase; margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #6d28d9; }
+  .btn:disabled { background: #2d2640; color: #6b5fa0; cursor: not-allowed; }
 
-    .field { margin-bottom: 18px; }
-    .field label {
-      display: block;
-      font-size: 0.68rem;
-      letter-spacing: 2px;
-      color: #4a6fa5;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-    .field input {
-      width: 100%;
-      background: #0a0e1a;
-      border: 1px solid #1e3a5f;
-      border-radius: 6px;
-      padding: 12px 14px;
-      color: #c9d1e0;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border 0.2s;
-    }
-    .field input:focus { border-color: #00d4ff; }
-
-    .btn {
-      width: 100%;
-      padding: 13px;
-      background: #00d4ff;
-      color: #0a0e1a;
-      border: none;
-      border-radius: 6px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.85rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      cursor: pointer;
-      text-transform: uppercase;
-      margin-top: 8px;
-      transition: background 0.2s;
-    }
-    .btn:hover { background: #00b8d9; }
-    .btn:disabled { background: #1e3a5f; color: #4a6fa5; cursor: not-allowed; }
-
-    .btn-outline {
-      width: 100%;
-      padding: 11px;
-      background: transparent;
-      color: #4a6fa5;
-      border: 1px solid #1e3a5f;
-      border-radius: 6px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      cursor: pointer;
-      text-transform: uppercase;
-      margin-top: 10px;
-      transition: all 0.2s;
-    }
-    .btn-outline:hover { border-color: #00d4ff; color: #00d4ff; }
-
-    .message {
-      margin-top: 16px;
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      text-align: center;
-      display: none;
-    }
-    .message.error { background: #3a0a0a; color: #ff4444; border: 1px solid #ff4444; }
-    .message.success { background: #0a3a1a; color: #00ff88; border: 1px solid #00ff88; }
-
-    .divider {
-      border: none;
-      border-top: 1px solid #1e3a5f;
-      margin: 20px 0;
-    }
-
-    .tab-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-    .tab {
-      flex: 1;
-      padding: 8px;
-      text-align: center;
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 6px;
-      border: 1px solid #1e3a5f;
-      color: #4a6fa5;
-      transition: all 0.2s;
-    }
-    .tab.active { border-color: #00d4ff; color: #00d4ff; background: #0a1e35; }
+  .message {
+    margin-top: 16px; padding: 10px 14px;
+    border-radius: 6px; font-size: 0.8rem;
+    text-align: center; display: none;
+  }
+  .message.error { background: #2d0f0f; color: #f87171; border: 1px solid #f87171; }
+  .message.success { background: #1e1b4b; color: #818cf8; border: 1px solid #818cf8; }
   </style>
 </head>
 <body>
@@ -158,19 +88,19 @@
   <div class="logo">
     <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
       <polygon points="18,2 34,10 34,26 18,34 2,26 2,10"
-        fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+        fill="none" stroke="#a78bfa" stroke-width="1.5"/>
       <polygon points="18,7 29,13 29,23 18,29 7,23 7,13"
-        fill="none" stroke="#00d4ff" stroke-width="0.8" opacity="0.5"/>
-      <circle cx="18" cy="18" r="4" fill="#00d4ff" opacity="0.9"/>
-      <line x1="18" y1="2"  x2="18" y2="7"  stroke="#00d4ff" stroke-width="1"/>
-      <line x1="18" y1="29" x2="18" y2="34" stroke="#00d4ff" stroke-width="1"/>
-      <line x1="2"  y1="10" x2="7"  y2="13" stroke="#00d4ff" stroke-width="1"/>
-      <line x1="29" y1="23" x2="34" y2="26" stroke="#00d4ff" stroke-width="1"/>
-      <line x1="34" y1="10" x2="29" y2="13" stroke="#00d4ff" stroke-width="1"/>
-      <line x1="2"  y1="26" x2="7"  y2="23" stroke="#00d4ff" stroke-width="1"/>
+        fill="none" stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
+      <circle cx="18" cy="18" r="4" fill="#a78bfa" opacity="0.9"/>
+      <line x1="18" y1="2"  x2="18" y2="7"  stroke="#a78bfa" stroke-width="1"/>
+      <line x1="18" y1="29" x2="18" y2="34" stroke="#a78bfa" stroke-width="1"/>
+      <line x1="2"  y1="10" x2="7"  y2="13" stroke="#a78bfa" stroke-width="1"/>
+      <line x1="29" y1="23" x2="34" y2="26" stroke="#a78bfa" stroke-width="1"/>
+      <line x1="34" y1="10" x2="29" y2="13" stroke="#a78bfa" stroke-width="1"/>
+      <line x1="2"  y1="26" x2="7"  y2="23" stroke="#a78bfa" stroke-width="1"/>
     </svg>
     <div class="logo-text">SENTRAGUARD</div>
-    <div class="logo-sub">MRINO — SECURITY OPERATIONS</div>
+    <div class="logo-sub">SECURITY OPERATIONS CENTER</div>
   </div>
 
   <div class="card">
