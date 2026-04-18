@@ -1,5 +1,5 @@
 # SentraGuard — Local Cybersecurity Application
-**Branding:** MRINO  
+**Branding:** nothing
 **Type:** Final Year Project (PFE) — Local Security Operations Center  
 **Stack:** Python 3, Flask, SQLite, HTML/CSS/JS  
 **Platform:** Kali Linux  
