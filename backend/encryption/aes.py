@@ -1,7 +1,7 @@
 import os
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
@@ -37,7 +37,6 @@ def hash_file(file_path: str) -> str:
     return sha256.hexdigest()
 
 def encrypt_file(input_path, key_name='default', password=None, unlock_time=None):
-    # Key derivation
     salt = None
     if password:
         salt = os.urandom(16)
@@ -51,24 +50,24 @@ def encrypt_file(input_path, key_name='default', password=None, unlock_time=None
     with open(input_path, 'rb') as f:
         data = f.read()
 
-    # Build metadata
     file_hash = hashlib.sha256(data).hexdigest()
+
+    # Store unlock_time as-is (local time string from UI)
     metadata = {
         'filename': os.path.basename(input_path),
-        'encrypted_at': datetime.utcnow().isoformat(),
+        'encrypted_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'hash': file_hash,
         'unlock_time': unlock_time,
         'password_protected': bool(password),
         'status': 'locked'
     }
+
     meta_bytes = json.dumps(metadata).encode()
     meta_len = len(meta_bytes).to_bytes(4, 'big')
-
     encrypted = aesgcm.encrypt(nonce, data, None)
     out_path = input_path + '.enc'
 
     with open(out_path, 'wb') as f:
-        # Format: meta_len(4) + meta + salt(16 if password) + nonce(12) + ciphertext
         f.write(meta_len)
         f.write(meta_bytes)
         if salt:
@@ -82,22 +81,34 @@ def decrypt_file(enc_path, key_name='default', password=None):
     with open(enc_path, 'rb') as f:
         raw = f.read()
 
-    # Parse metadata
     meta_len = int.from_bytes(raw[:4], 'big')
     meta_bytes = raw[4:4+meta_len]
     metadata = json.loads(meta_bytes.decode())
     offset = 4 + meta_len
 
-    # Timelock check
+    # Timelock check using local time
     unlock_time = metadata.get('unlock_time')
     if unlock_time:
-        unlock_dt = datetime.fromisoformat(unlock_time)
-        if datetime.utcnow() < unlock_dt:
-            raise ValueError(
-                f"File is timelocked until {unlock_dt.strftime('%Y-%m-%d %H:%M:%S')} UTC"
-            )
+        try:
+            # Handle both ISO format and datetime-local format
+            unlock_time_clean = unlock_time.replace('T', ' ')
+            if len(unlock_time_clean) > 19:
+                unlock_time_clean = unlock_time_clean[:19]
+            unlock_dt = datetime.strptime(unlock_time_clean, '%Y-%m-%d %H:%M:%S')
+            now = datetime.now()
+            if now < unlock_dt:
+                remaining = unlock_dt - now
+                hours, remainder = divmod(int(remaining.total_seconds()), 3600)
+                minutes, seconds = divmod(remainder, 60)
+                raise ValueError(
+                    f"File is timelocked until {unlock_dt.strftime('%Y-%m-%d %H:%M:%S')} "
+                    f"({hours}h {minutes}m {seconds}s remaining)"
+                )
+        except ValueError as e:
+            if 'timelocked' in str(e):
+                raise
+            # If date parsing fails, skip timelock check
 
-    # Key
     if metadata.get('password_protected'):
         if not password:
             raise ValueError("This file requires a password to decrypt")
@@ -109,14 +120,13 @@ def decrypt_file(enc_path, key_name='default', password=None):
 
     nonce = raw[offset:offset+12]
     ciphertext = raw[offset+12:]
-
     aesgcm = AESGCM(key)
+
     try:
         decrypted = aesgcm.decrypt(nonce, ciphertext, None)
     except Exception:
         raise ValueError("Decryption failed — wrong password or corrupted file")
 
-    # Verify hash
     actual_hash = hashlib.sha256(decrypted).hexdigest()
     if actual_hash != metadata.get('hash'):
         raise ValueError("File integrity check failed — hash mismatch")

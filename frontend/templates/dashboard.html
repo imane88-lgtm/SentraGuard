@@ -4,185 +4,145 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SentraGuard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: #13111a;
-      color: #e2e0e9;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .sidebar {
-      width: 220px; min-width: 220px;
-      background: #1a1726;
-      border-right: 1px solid #2d2640;
-      display: flex; flex-direction: column;
-    }
-    .sidebar-logo {
-      padding: 24px 20px 20px;
-      border-bottom: 1px solid #2d2640;
-    }
-    .sidebar-logo svg { width: 32px; height: 32px; margin-bottom: 8px; }
-    .logo-text { font-size: 1.1rem; font-weight: 700; color: #a78bfa; letter-spacing: 2px; }
-    .logo-sub { font-size: 0.55rem; color: #6b5fa0; letter-spacing: 2px; margin-top: 2px; }
-    .nav { flex: 1; padding: 16px 0; }
-    .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 20px; cursor: pointer;
-      font-size: 0.85rem; color: #6b5fa0;
-      border-left: 3px solid transparent;
-      transition: all 0.2s; user-select: none;
-    }
-    .nav-item:hover { background: #1f1c2e; color: #a78bfa; }
-    .nav-item.active { background: #1f1c2e; color: #a78bfa; border-left-color: #7c3aed; font-weight: 600; }
-    .nav-icon {
-      font-size: 0.7rem; font-style: normal;
-      background: #2d2640; color: #a78bfa;
-      padding: 3px 5px; border-radius: 4px;
-      font-weight: 700; letter-spacing: 0.5px;
-      min-width: 36px; text-align: center;
-    }
-    .sidebar-footer {
-      padding: 16px 20px;
-      border-top: 1px solid #2d2640;
-      font-size: 0.72rem; color: #6b5fa0;
-    }
-    .user-info { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .user-dot { width: 8px; height: 8px; border-radius: 50%; background: #818cf8; }
-    .logout-btn {
-      width: 100%; padding: 8px;
-      background: transparent; border: 1px solid #2d2640;
-      border-radius: 6px; color: #6b5fa0;
-      font-size: 0.72rem; letter-spacing: 1px;
-      cursor: pointer; text-transform: uppercase; transition: all 0.2s;
-    }
-    .logout-btn:hover { border-color: #7c3aed; color: #a78bfa; }
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar {
-      background: #1a1726; border-bottom: 1px solid #2d2640;
-      padding: 14px 24px; display: flex;
-      align-items: center; justify-content: space-between;
-      font-size: 0.75rem; color: #6b5fa0;
-    }
-    .topbar-title { font-size: 1rem; font-weight: 600; color: #e2e0e9; }
-    .topbar-right { display: flex; gap: 12px; align-items: center; }
-    .status-pill {
-      background: #1f1c2e; border: 1px solid #2d2640;
-      border-radius: 20px; padding: 4px 12px;
-      font-size: 0.68rem; color: #818cf8;
-    }
-    .content { flex: 1; overflow-y: auto; padding: 24px; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-    .cards-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
-    .card { background: #1a1726; border: 1px solid #2d2640; border-radius: 10px; padding: 20px; }
-    .card-title { font-size: 0.62rem; letter-spacing: 2px; color: #6b5fa0; margin-bottom: 10px; text-transform: uppercase; }
-    .card-value { font-size: 1.9rem; font-weight: 700; color: #a78bfa; }
-    .card-value.warning { color: #f59e0b; }
-    .card-value.critical { color: #f87171; }
-    .card-value.ok { color: #818cf8; }
-    .bar-bg { background: #2d2640; border-radius: 4px; height: 5px; margin-top: 10px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 4px; background: #7c3aed; transition: width 0.5s ease; }
-    .bar-fill.warning { background: #f59e0b; }
-    .bar-fill.critical { background: #f87171; }
-    .panels-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-    .panel { background: #1a1726; border: 1px solid #2d2640; border-radius: 10px; padding: 20px; }
-    .panel-title {
-      font-size: 0.62rem; letter-spacing: 2px; color: #6b5fa0;
-      text-transform: uppercase; margin-bottom: 14px;
-      border-bottom: 1px solid #2d2640; padding-bottom: 8px;
-    }
-    .alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1f1c2e; font-size: 0.8rem; }
-    .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: 600; white-space: nowrap; text-transform: uppercase; }
-    .badge.info { background: #1e1b4b; color: #818cf8; }
-    .badge.warning { background: #2d1f00; color: #f59e0b; }
-    .badge.critical { background: #2d0f0f; color: #f87171; }
-    .proc-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 0.78rem; border-bottom: 1px solid #1f1c2e; }
-    .proc-name { color: #a78bfa; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ids-status { display: flex; align-items: center; gap: 8px; padding: 9px 0; font-size: 0.8rem; border-bottom: 1px solid #1f1c2e; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #818cf8; flex-shrink: 0; }
-    .dot.alert { background: #f87171; animation: pulse 1s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .enc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-    .enc-label { font-size: 0.62rem; letter-spacing: 2px; color: #6b5fa0; text-transform: uppercase; display: block; margin-bottom: 6px; }
-    .enc-input {
-      width: 100%; background: #13111a; border: 1px solid #2d2640;
-      border-radius: 6px; padding: 10px 12px; color: #e2e0e9;
-      font-family: 'Segoe UI', sans-serif; font-size: 0.85rem;
-      outline: none; margin-bottom: 12px; transition: border 0.2s;
-    }
-    .enc-input:focus { border-color: #7c3aed; }
-    .btn-primary {
-      background: #7c3aed; color: #fff; border: none;
-      border-radius: 6px; padding: 10px 18px; font-size: 0.78rem;
-      font-weight: 600; cursor: pointer; transition: background 0.2s; margin-right: 8px;
-    }
-    .btn-primary:hover { background: #6d28d9; }
-    .btn-outline {
-      background: transparent; color: #a78bfa; border: 1px solid #2d2640;
-      border-radius: 6px; padding: 10px 18px; font-size: 0.78rem;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .btn-outline:hover { border-color: #7c3aed; }
-    .result-msg { margin-top: 10px; font-size: 0.78rem; color: #818cf8; min-height: 20px; }
-    .result-msg.err { color: #f87171; }
-    .alerts-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .alerts-table th { text-align: left; padding: 10px 12px; font-size: 0.62rem; letter-spacing: 2px; color: #6b5fa0; text-transform: uppercase; border-bottom: 1px solid #2d2640; }
-    .alerts-table td { padding: 10px 12px; border-bottom: 1px solid #1f1c2e; color: #c4c0d4; }
-    .alerts-table tr:hover td { background: #1f1c2e; }
-    .users-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .users-table th { text-align: left; padding: 10px 12px; font-size: 0.62rem; letter-spacing: 2px; color: #6b5fa0; text-transform: uppercase; border-bottom: 1px solid #2d2640; }
-    .users-table td { padding: 10px 12px; border-bottom: 1px solid #1f1c2e; color: #c4c0d4; }
-    .settings-group { margin-bottom: 24px; }
-    .settings-label { font-size: 0.62rem; letter-spacing: 2px; color: #6b5fa0; text-transform: uppercase; margin-bottom: 8px; display: block; }
-    .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #1a1726; border: 1px solid #2d2640; border-radius: 8px; margin-bottom: 8px; font-size: 0.85rem; }
-    .settings-val { color: #a78bfa; font-size: 0.8rem; }
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: #13111a; }
-    ::-webkit-scrollbar-thumb { background: #2d2640; border-radius: 4px; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#0f0d17;color:#e2e0e9;font-family:'Inter','Segoe UI',sans-serif;display:flex;height:100vh;overflow:hidden;}
 
-    /* LIGHT MODE */
-    body.light { background: #f4f3f8; color: #1a1726; }
-    body.light .sidebar { background: #ffffff; border-color: #e2dff0; }
-    body.light .sidebar-logo { border-color: #e2dff0; }
-    body.light .logo-text { color: #7c3aed; }
-    body.light .logo-sub { color: #9d8ec7; }
-    body.light .nav-item { color: #9d8ec7; }
-    body.light .nav-item:hover { background: #f0edfb; color: #7c3aed; }
-    body.light .nav-item.active { background: #f0edfb; color: #7c3aed; border-left-color: #7c3aed; }
-    body.light .nav-icon { background: #f0edfb; color: #7c3aed; }
-    body.light .sidebar-footer { border-color: #e2dff0; color: #9d8ec7; }
-    body.light .logout-btn { border-color: #e2dff0; color: #9d8ec7; }
-    body.light .logout-btn:hover { border-color: #7c3aed; color: #7c3aed; }
-    body.light .topbar { background: #ffffff; border-color: #e2dff0; color: #9d8ec7; }
-    body.light .topbar-title { color: #1a1726; }
-    body.light .status-pill { background: #f0edfb; border-color: #e2dff0; color: #7c3aed; }
-    body.light .card { background: #ffffff; border-color: #e2dff0; }
-    body.light .card-title { color: #9d8ec7; }
-    body.light .card-value { color: #7c3aed; }
-    body.light .bar-bg { background: #e2dff0; }
-    body.light .panel { background: #ffffff; border-color: #e2dff0; }
-    body.light .panel-title { color: #9d8ec7; border-color: #e2dff0; }
-    body.light .alert-item { border-color: #f0edfb; }
-    body.light .proc-row { border-color: #f0edfb; color: #1a1726; }
-    body.light .proc-name { color: #7c3aed; }
-    body.light .ids-status { border-color: #f0edfb; color: #1a1726; }
-    body.light .enc-input { background: #f4f3f8; border-color: #e2dff0; color: #1a1726; }
-    body.light .enc-label { color: #9d8ec7; }
-    body.light .result-msg { color: #7c3aed; }
-    body.light .btn-outline { color: #7c3aed; border-color: #e2dff0; }
-    body.light .alerts-table th { color: #9d8ec7; border-color: #e2dff0; }
-    body.light .alerts-table td { border-color: #f0edfb; color: #1a1726; }
-    body.light .alerts-table tr:hover td { background: #f0edfb; }
-    body.light .users-table th { color: #9d8ec7; border-color: #e2dff0; }
-    body.light .users-table td { border-color: #f0edfb; color: #1a1726; }
-    body.light .settings-row { background: #ffffff; border-color: #e2dff0; color: #1a1726; }
-    body.light .settings-label { color: #9d8ec7; }
-    body.light .settings-val { color: #7c3aed; }
-    body.light ::-webkit-scrollbar-track { background: #f4f3f8; }
-    body.light ::-webkit-scrollbar-thumb { background: #e2dff0; }
+    .sidebar{width:220px;min-width:220px;background:linear-gradient(180deg,#1a1530 0%,#130f23 100%);border-right:1px solid rgba(124,58,237,0.15);display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.3);}
+    .sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(124,58,237,0.12);}
+    .sidebar-logo svg{width:30px;height:30px;margin-bottom:8px;}
+    .logo-text{font-size:1rem;font-weight:700;letter-spacing:3px;background:linear-gradient(90deg,#a78bfa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .logo-sub{font-size:0.5rem;color:#4c3d6e;letter-spacing:2px;margin-top:2px;text-transform:uppercase;}
+    .nav{flex:1;padding:10px 0;overflow-y:auto;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:0.82rem;font-weight:400;color:#6b5fa0;transition:all 0.2s ease;user-select:none;margin:2px 8px;border-radius:8px;position:relative;}
+    .nav-item:hover{background:rgba(124,58,237,0.1);color:#c4b5fd;transform:translateX(2px);}
+    .nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,0.2),rgba(129,140,248,0.08));color:#c4b5fd;font-weight:600;box-shadow:inset 3px 0 0 #7c3aed;}
+    .nav-icon{font-size:0.85rem;width:16px;text-align:center;transition:transform 0.2s ease;}
+    .nav-item:hover .nav-icon{transform:scale(1.15);}
+    .nav-item.active .nav-icon{color:#a78bfa;}
+    .sidebar-footer{padding:14px 16px;border-top:1px solid rgba(124,58,237,0.12);font-size:0.7rem;color:#4c3d6e;}
+    .user-info{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 10px;background:rgba(124,58,237,0.08);border-radius:8px;border:1px solid rgba(124,58,237,0.1);}
+    .user-dot{width:7px;height:7px;border-radius:50%;background:#818cf8;box-shadow:0 0 6px #818cf8;animation:glow 2s infinite alternate;}
+    @keyframes glow{from{box-shadow:0 0 4px #818cf8;}to{box-shadow:0 0 10px #a78bfa;}}
+    .logout-btn{width:100%;padding:8px;background:transparent;border:1px solid rgba(124,58,237,0.2);border-radius:8px;color:#4c3d6e;font-size:0.7rem;font-family:'Inter',sans-serif;letter-spacing:1px;cursor:pointer;text-transform:uppercase;transition:all 0.2s ease;}
+    .logout-btn:hover{border-color:#7c3aed;color:#c4b5fd;background:rgba(124,58,237,0.08);}
+
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#0f0d17;}
+    .topbar{background:linear-gradient(90deg,#1a1530,#130f23);border-bottom:1px solid rgba(124,58,237,0.12);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 20px rgba(0,0,0,0.2);flex-shrink:0;}
+    .topbar-title{font-size:1rem;font-weight:600;color:#e2e0e9;letter-spacing:0.3px;}
+    .topbar-right{display:flex;gap:10px;align-items:center;}
+    .status-pill{background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:4px 12px;font-size:0.65rem;color:#a78bfa;font-weight:500;letter-spacing:0.5px;}
+
+    .content{flex:1;overflow-y:auto;padding:20px;}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;animation:fadeIn 0.25s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+    .cards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px;}
+    .card{background:linear-gradient(135deg,#1a1530 0%,#16122a 100%);border:1px solid rgba(124,58,237,0.12);border-radius:12px;padding:18px;transition:transform 0.2s ease,box-shadow 0.2s ease;position:relative;overflow:hidden;}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7c3aed,#818cf8);opacity:0;transition:opacity 0.2s ease;}
+    .card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,58,237,0.15);}
+    .card:hover::before{opacity:1;}
+    .card-title{font-size:0.6rem;letter-spacing:2px;color:#4c3d6e;margin-bottom:10px;text-transform:uppercase;font-weight:600;}
+    .card-value{font-size:1.8rem;font-weight:700;color:#c4b5fd;}
+    .card-value.warning{color:#f59e0b;}
+    .card-value.critical{color:#f87171;}
+    .card-value.ok{color:#818cf8;}
+    .bar-bg{background:rgba(124,58,237,0.12);border-radius:6px;height:4px;margin-top:10px;overflow:hidden;}
+    .bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#7c3aed,#818cf8);transition:width 0.6s ease;}
+    .bar-fill.warning{background:linear-gradient(90deg,#d97706,#f59e0b);}
+    .bar-fill.critical{background:linear-gradient(90deg,#dc2626,#f87171);}
+
+    .panels-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+    .panel{background:linear-gradient(135deg,#1a1530 0%,#16122a 100%);border:1px solid rgba(124,58,237,0.12);border-radius:12px;padding:20px;}
+    .panel:hover{box-shadow:0 4px 24px rgba(124,58,237,0.1);}
+    .panel-title{font-size:0.6rem;letter-spacing:2px;color:#6b5fa0;text-transform:uppercase;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(124,58,237,0.1);display:flex;align-items:center;justify-content:space-between;}
+
+    .badge{padding:2px 8px;border-radius:6px;font-size:0.58rem;font-weight:600;white-space:nowrap;text-transform:uppercase;letter-spacing:0.5px;}
+    .badge.info{background:rgba(129,140,248,0.12);color:#818cf8;border:1px solid rgba(129,140,248,0.2);}
+    .badge.warning{background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);}
+    .badge.critical{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.2);}
+
+    .alert-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(124,58,237,0.06);font-size:0.78rem;}
+    .alert-item:hover{background:rgba(124,58,237,0.04);border-radius:6px;padding-left:6px;}
+    .proc-row{display:flex;justify-content:space-between;padding:7px 0;font-size:0.76rem;border-bottom:1px solid rgba(124,58,237,0.06);gap:10px;}
+    .proc-name{color:#a78bfa;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+    .ids-status{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:0.78rem;border-bottom:1px solid rgba(124,58,237,0.06);}
+    .dot{width:7px;height:7px;border-radius:50%;background:#818cf8;flex-shrink:0;box-shadow:0 0 5px #818cf8;}
+    .dot.alert{background:#f87171;box-shadow:0 0 5px #f87171;animation:pulse 1s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+    .enc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+    .enc-label{font-size:0.6rem;letter-spacing:1.5px;color:#6b5fa0;text-transform:uppercase;font-weight:600;display:block;margin-bottom:5px;}
+    .enc-input{width:100%;background:rgba(15,13,23,0.8);border:1px solid rgba(124,58,237,0.15);border-radius:8px;padding:9px 12px;color:#e2e0e9;font-family:'Inter',sans-serif;font-size:0.82rem;outline:none;margin-bottom:12px;transition:border 0.2s ease,box-shadow 0.2s ease;}
+    .enc-input:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,0.1);}
+    .btn-primary{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.78rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s ease;margin-right:8px;letter-spacing:0.3px;box-shadow:0 4px 12px rgba(124,58,237,0.3);}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,0.4);background:linear-gradient(135deg,#8b5cf6,#7c3aed);}
+    .btn-outline{background:transparent;color:#a78bfa;border:1px solid rgba(124,58,237,0.3);border-radius:8px;padding:9px 18px;font-size:0.78rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s ease;font-weight:500;}
+    .btn-outline:hover{border-color:#7c3aed;background:rgba(124,58,237,0.08);transform:translateY(-1px);}
+    .result-msg{margin-top:10px;font-size:0.78rem;color:#818cf8;min-height:20px;line-height:1.5;}
+    .result-msg.err{color:#f87171;}
+    .result-msg.ok{color:#818cf8;}
+
+    .alerts-table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+    .alerts-table th{text-align:left;padding:9px 12px;font-size:0.6rem;letter-spacing:2px;color:#4c3d6e;text-transform:uppercase;font-weight:600;border-bottom:1px solid rgba(124,58,237,0.12);}
+    .alerts-table td{padding:10px 12px;border-bottom:1px solid rgba(124,58,237,0.06);color:#c4c0d4;transition:background 0.15s;}
+    .alerts-table tr:hover td{background:rgba(124,58,237,0.04);}
+    .users-table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+    .users-table th{text-align:left;padding:9px 12px;font-size:0.6rem;letter-spacing:2px;color:#4c3d6e;text-transform:uppercase;font-weight:600;border-bottom:1px solid rgba(124,58,237,0.12);}
+    .users-table td{padding:10px 12px;border-bottom:1px solid rgba(124,58,237,0.06);color:#c4c0d4;}
+
+    .settings-group{margin-bottom:22px;}
+    .settings-label{font-size:0.6rem;letter-spacing:2px;color:#4c3d6e;text-transform:uppercase;font-weight:600;margin-bottom:8px;display:block;}
+    .settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.1);border-radius:10px;margin-bottom:8px;font-size:0.83rem;transition:background 0.15s ease;}
+    .settings-row:hover{background:rgba(124,58,237,0.08);}
+    .settings-val{color:#a78bfa;font-size:0.78rem;font-weight:500;}
+
+    body.light{background:#f5f3ff;color:#1a1726;}
+    body.light .sidebar{background:linear-gradient(180deg,#ffffff,#f9f7ff);border-color:#e5e0f5;}
+    body.light .sidebar-logo{border-color:#e5e0f5;}
+    body.light .logo-sub{color:#9d8ec7;}
+    body.light .nav-item{color:#9d8ec7;}
+    body.light .nav-item:hover{background:rgba(124,58,237,0.07);color:#7c3aed;}
+    body.light .nav-item.active{background:rgba(124,58,237,0.1);color:#7c3aed;box-shadow:inset 3px 0 0 #7c3aed;}
+    body.light .sidebar-footer{border-color:#e5e0f5;}
+    body.light .user-info{background:rgba(124,58,237,0.05);border-color:#e5e0f5;}
+    body.light .logout-btn{border-color:#e5e0f5;color:#9d8ec7;}
+    body.light .topbar{background:linear-gradient(90deg,#ffffff,#f9f7ff);border-color:#e5e0f5;}
+    body.light .topbar-title{color:#1a1726;}
+    body.light .status-pill{background:rgba(124,58,237,0.07);border-color:#e5e0f5;color:#7c3aed;}
+    body.light .main{background:#f5f3ff;}
+    body.light .card{background:linear-gradient(135deg,#ffffff,#faf8ff);border-color:#e5e0f5;}
+    body.light .card-title{color:#9d8ec7;}
+    body.light .card-value{color:#7c3aed;}
+    body.light .bar-bg{background:#e5e0f5;}
+    body.light .panel{background:linear-gradient(135deg,#ffffff,#faf8ff);border-color:#e5e0f5;}
+    body.light .panel-title{color:#9d8ec7;border-color:#e5e0f5;}
+    body.light .enc-input{background:#f5f3ff;border-color:#e5e0f5;color:#1a1726;}
+    body.light .enc-label{color:#9d8ec7;}
+    body.light .settings-row{background:rgba(124,58,237,0.03);border-color:#e5e0f5;color:#1a1726;}
+    body.light .alerts-table th{color:#9d8ec7;border-color:#e5e0f5;}
+    body.light .alerts-table td{border-color:#f0edfb;color:#1a1726;}
+    body.light .users-table th{color:#9d8ec7;border-color:#e5e0f5;}
+    body.light .users-table td{border-color:#f0edfb;color:#1a1726;}
+    body.light .proc-row{border-color:#f0edfb;color:#1a1726;}
+    body.light .proc-name{color:#7c3aed;}
+    body.light .ids-status{border-color:#f0edfb;}
+    body.light .alert-item{border-color:#f0edfb;}
+    body.light .btn-outline{color:#7c3aed;border-color:rgba(124,58,237,0.3);}
+
+    ::-webkit-scrollbar{width:4px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.2);border-radius:4px;}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,0.4);}
+
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:#1a1530;border:1px solid rgba(124,58,237,0.3);border-radius:16px;padding:28px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+    .modal-title{font-size:0.95rem;font-weight:600;color:#c4b5fd;margin-bottom:18px;}
   </style>
 </head>
 <body>
@@ -193,41 +153,36 @@
       <polygon points="18,2 34,10 34,26 18,34 2,26 2,10" fill="none" stroke="#a78bfa" stroke-width="1.5"/>
       <polygon points="18,7 29,13 29,23 18,29 7,23 7,13" fill="none" stroke="#a78bfa" stroke-width="0.8" opacity="0.5"/>
       <circle cx="18" cy="18" r="4" fill="#a78bfa" opacity="0.9"/>
-      <line x1="18" y1="2"  x2="18" y2="7"  stroke="#a78bfa" stroke-width="1"/>
+      <line x1="18" y1="2" x2="18" y2="7" stroke="#a78bfa" stroke-width="1"/>
       <line x1="18" y1="29" x2="18" y2="34" stroke="#a78bfa" stroke-width="1"/>
-      <line x1="2"  y1="10" x2="7"  y2="13" stroke="#a78bfa" stroke-width="1"/>
+      <line x1="2" y1="10" x2="7" y2="13" stroke="#a78bfa" stroke-width="1"/>
       <line x1="29" y1="23" x2="34" y2="26" stroke="#a78bfa" stroke-width="1"/>
       <line x1="34" y1="10" x2="29" y2="13" stroke="#a78bfa" stroke-width="1"/>
-      <line x1="2"  y1="26" x2="7"  y2="23" stroke="#a78bfa" stroke-width="1"/>
+      <line x1="2" y1="26" x2="7" y2="23" stroke="#a78bfa" stroke-width="1"/>
     </svg>
     <div class="logo-text">SENTRAGUARD</div>
     <div class="logo-sub">SECURITY OPERATIONS</div>
   </div>
 
   <nav class="nav">
-    <div class="nav-item active" onclick="switchTab('encryption')">
-      <i class="nav-icon">ENC</i> Encryption
+    <div class="nav-item active" onclick="switchTab('encryption',this)"><i class="nav-icon fa-solid fa-lock"></i> Encryption</div>
+    <div class="nav-item" onclick="switchTab('vault',this)"><i class="nav-icon fa-solid fa-vault"></i> Vault</div>
+    <div class="nav-item" onclick="switchTab('comm',this)"><i class="nav-icon fa-solid fa-satellite-dish"></i> SecureComm</div>
+    <div class="nav-item" onclick="switchTab('integrity',this)"><i class="nav-icon fa-solid fa-fingerprint"></i> Integrity</div>
+    <div class="nav-item" onclick="switchTab('monitoring',this)"><i class="nav-icon fa-solid fa-chart-line"></i> Monitoring</div>
+    <div class="nav-item" onclick="switchTab('alerts',this)">
+      <i class="nav-icon fa-solid fa-bell"></i> Alerts
+      <span id="crit-badge" style="margin-left:auto;background:rgba(248,113,113,0.15);color:#f87171;font-size:0.58rem;padding:2px 6px;border-radius:10px;display:none;font-weight:600;">0</span>
     </div>
-    <div class="nav-item" onclick="switchTab('monitoring')">
-      <i class="nav-icon">MON</i> Monitoring
-    </div>
-    <div class="nav-item" onclick="switchTab('alerts')">
-      <i class="nav-icon">ALT</i> Alerts
-      <span id="crit-badge" style="margin-left:auto; background:#2d0f0f; color:#f87171;
-        font-size:0.6rem; padding:1px 6px; border-radius:10px; display:none">0</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('users')">
-      <i class="nav-icon">USR</i> Users
-    </div>
-    <div class="nav-item" onclick="switchTab('settings')">
-      <i class="nav-icon">SET</i> Settings
-    </div>
+    <div class="nav-item" onclick="switchTab('users',this)"><i class="nav-icon fa-solid fa-users"></i> Users</div>
+    <div class="nav-item" onclick="switchTab('logs',this)"><i class="nav-icon fa-solid fa-scroll"></i> Logs</div>
+    <div class="nav-item" onclick="switchTab('settings',this)"><i class="nav-icon fa-solid fa-gear"></i> Settings</div>
   </nav>
 
   <div class="sidebar-footer">
     <div class="user-info">
       <div class="user-dot"></div>
-      <span id="session-user">--</span>
+      <span id="session-user" style="color:#a78bfa;font-weight:500;">--</span>
     </div>
     <button class="logout-btn" onclick="doLogout()">Logout</button>
   </div>
@@ -244,207 +199,482 @@
 
   <div class="content">
 
-    <!-- ENCRYPTION -->
     <div class="tab-panel active" id="tab-encryption">
       <div class="enc-grid">
         <div class="panel">
-          <div class="panel-title">Encrypt File</div>
+          <div class="panel-title"><i class="fa-solid fa-lock" style="margin-right:8px;color:#a78bfa;"></i>Encrypt File</div>
           <label class="enc-label">File Path</label>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input class="enc-input" id="enc-path" type="text"
-              placeholder="Click Browse or type path" style="margin:0; flex:1;"/>
-            <button class="btn-outline" style="padding:10px 14px; white-space:nowrap;"
-              onclick="browseFile('enc-path')">Browse</button>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <input class="enc-input" id="enc-path" type="text" placeholder="Browse or type path" style="margin:0;flex:1;"/>
+            <button class="btn-outline" style="padding:9px 12px;white-space:nowrap;" onclick="browseFile('enc-path')"><i class="fa-solid fa-folder-open"></i></button>
           </div>
           <label class="enc-label">Key Name</label>
           <input class="enc-input" id="enc-key" type="text" placeholder="default"/>
           <label class="enc-label">Password (optional)</label>
           <input class="enc-input" id="enc-pass" type="password" placeholder="Leave blank to use key file"/>
           <label class="enc-label">Timelock — Unlock After (optional)</label>
-          <input class="enc-input" id="enc-unlock" type="datetime-local"/>
+          <input class="enc-input" id="enc-unlock" type="datetime-local" style="color-scheme:dark;"/>
+          <div id="timelock-preview" style="font-size:0.7rem;color:#6b5fa0;margin-top:-8px;margin-bottom:12px;"></div>
           <div>
-            <button class="btn-primary" onclick="encryptFile()">Encrypt</button>
-            <button class="btn-outline" onclick="genKey()">Gen Key</button>
+            <button class="btn-primary" onclick="encryptFile()"><i class="fa-solid fa-lock"></i> Encrypt</button>
+            <button class="btn-outline" onclick="genKey()"><i class="fa-solid fa-key"></i> Gen Key</button>
           </div>
           <div class="result-msg" id="enc-result"></div>
         </div>
 
         <div class="panel">
-          <div class="panel-title">Decrypt File</div>
+          <div class="panel-title"><i class="fa-solid fa-unlock" style="margin-right:8px;color:#a78bfa;"></i>Decrypt File</div>
           <label class="enc-label">Encrypted File Path</label>
-          <div style="display:flex; gap:8px; margin-bottom:12px;">
-            <input class="enc-input" id="dec-path" type="text"
-              placeholder="Click Browse or type path" style="margin:0; flex:1;"/>
-            <button class="btn-outline" style="padding:10px 14px; white-space:nowrap;"
-              onclick="browseFile('dec-path')">Browse</button>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <input class="enc-input" id="dec-path" type="text" placeholder="Browse or type path" style="margin:0;flex:1;"/>
+            <button class="btn-outline" style="padding:9px 12px;" onclick="browseFile('dec-path')"><i class="fa-solid fa-folder-open"></i></button>
           </div>
           <label class="enc-label">Key Name</label>
           <input class="enc-input" id="dec-key" type="text" placeholder="default"/>
           <label class="enc-label">Password (optional)</label>
           <input class="enc-input" id="dec-pass" type="password" placeholder="Leave blank to use key file"/>
           <div>
-            <button class="btn-primary" onclick="decryptFile()">Decrypt</button>
+            <button class="btn-primary" onclick="decryptFile()"><i class="fa-solid fa-unlock"></i> Decrypt</button>
           </div>
           <div class="result-msg" id="dec-result"></div>
         </div>
       </div>
 
       <div class="panel">
-        <div class="panel-title">File Hash — SHA-256</div>
-        <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
-          <input class="enc-input" id="hash-path" type="text"
-            placeholder="Click Browse or type path" style="margin:0; flex:1;"/>
-          <button class="btn-outline" style="padding:10px 14px;"
-            onclick="browseFile('hash-path')">Browse</button>
-          <button class="btn-primary" onclick="hashFile()">Generate Hash</button>
+        <div class="panel-title"><i class="fa-solid fa-hashtag" style="margin-right:8px;color:#a78bfa;"></i>File Hash — SHA-256</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+          <input class="enc-input" id="hash-path" type="text" placeholder="Browse or type file path" style="margin:0;flex:1;"/>
+          <button class="btn-outline" style="padding:9px 12px;" onclick="browseFile('hash-path')"><i class="fa-solid fa-folder-open"></i></button>
+          <button class="btn-primary" onclick="hashFile()"><i class="fa-solid fa-hashtag"></i> Generate</button>
         </div>
-        <div id="hash-result" style="font-size:0.78rem; color:#6b5fa0;">Hash will appear here</div>
+        <div id="hash-result" style="font-size:0.78rem;color:#6b5fa0;padding:10px;background:rgba(124,58,237,0.04);border-radius:8px;border:1px solid rgba(124,58,237,0.08);min-height:44px;display:flex;align-items:center;">Hash will appear here</div>
       </div>
     </div>
 
-    <!-- MONITORING -->
+    <div class="tab-panel" id="tab-vault">
+      <div class="cards-row" style="grid-template-columns:repeat(3,1fr);">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-file-shield" style="margin-right:6px;"></i>Files in Vault</div>
+          <div class="card-value" id="vault-total">--</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-weight-hanging" style="margin-right:6px;"></i>Vault Size</div>
+          <div class="card-value ok" id="vault-size">-- MB</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-key" style="margin-right:6px;"></i>Password Protected</div>
+          <div class="card-value" id="vault-pw">--</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-title"><i class="fa-solid fa-plus" style="margin-right:8px;color:#a78bfa;"></i>Add File to Vault</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;">
+          <div>
+            <label class="enc-label">File Path</label>
+            <div style="display:flex;gap:8px;">
+              <input class="enc-input" id="vault-file-path" type="text" placeholder="Browse or type path" style="margin:0;flex:1;"/>
+              <button class="btn-outline" style="padding:9px 12px;" onclick="browseFile('vault-file-path')"><i class="fa-solid fa-folder-open"></i></button>
+            </div>
+          </div>
+          <div>
+            <label class="enc-label">Password (optional)</label>
+            <input class="enc-input" id="vault-password" type="password" placeholder="Extra protection" style="margin:0;"/>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <input type="checkbox" id="vault-delete-original" style="accent-color:#7c3aed;width:15px;height:15px;"/>
+          <label for="vault-delete-original" style="font-size:0.78rem;color:#6b5fa0;cursor:pointer;">Delete original file after adding to vault</label>
+        </div>
+        <button class="btn-primary" onclick="addToVault()"><i class="fa-solid fa-vault"></i> Add to Vault</button>
+        <div class="result-msg" id="vault-add-result"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <span><i class="fa-solid fa-list" style="margin-right:8px;color:#a78bfa;"></i>Vault Contents</span>
+          <button class="btn-outline" style="padding:4px 10px;font-size:0.7rem;" onclick="loadVault()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div id="vault-list">
+          <div style="text-align:center;color:#4c3d6e;padding:36px;font-size:0.83rem;">
+            <i class="fa-solid fa-vault" style="font-size:1.8rem;margin-bottom:10px;display:block;opacity:0.3;"></i>
+            Vault is empty
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-integrity">
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-title"><i class="fa-solid fa-hashtag" style="margin-right:8px;color:#a78bfa;"></i>SHA-256 Hash Generator</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+          <input class="enc-input" id="hash-single-path" type="text" placeholder="Browse or type file path" style="margin:0;flex:1;"/>
+          <button class="btn-outline" style="padding:9px 12px;" onclick="browseFile('hash-single-path')"><i class="fa-solid fa-folder-open"></i></button>
+          <button class="btn-primary" onclick="generateSingleHash()"><i class="fa-solid fa-hashtag"></i> Generate</button>
+        </div>
+        <div id="hash-single-result" style="font-size:0.8rem;color:#6b5fa0;padding:10px;background:rgba(124,58,237,0.04);border-radius:8px;border:1px solid rgba(124,58,237,0.08);min-height:44px;display:flex;align-items:center;">Hash will appear here</div>
+      </div>
+
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-title"><i class="fa-solid fa-shield-halved" style="margin-right:8px;color:#a78bfa;"></i>File Integrity Verification</div>
+        <p style="font-size:0.76rem;color:#6b5fa0;margin-bottom:14px;line-height:1.6;">Compare a file against its encrypted version to detect modifications.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+          <div>
+            <label class="enc-label">Original File</label>
+            <div style="display:flex;gap:8px;">
+              <input class="enc-input" id="integrity-original" type="text" placeholder="Path to original" style="margin:0;flex:1;"/>
+              <button class="btn-outline" style="padding:9px 12px;" onclick="browseFile('integrity-original')"><i class="fa-solid fa-folder-open"></i></button>
+            </div>
+          </div>
+          <div>
+            <label class="enc-label">Encrypted File (.enc)</label>
+            <div style="display:flex;gap:8px;">
+              <input class="enc-input" id="integrity-enc" type="text" placeholder="Path to .enc file" style="margin:0;flex:1;"/>
+              <button class="btn-outline" style="padding:9px 12px;" onclick="browseFile('integrity-enc')"><i class="fa-solid fa-folder-open"></i></button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="checkIntegrity()" style="margin-bottom:14px;"><i class="fa-solid fa-shield-halved"></i> Verify Integrity</button>
+        <div id="integrity-result" style="display:none;padding:18px;border-radius:10px;border:1px solid;text-align:center;"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><i class="fa-solid fa-clock-rotate-left" style="margin-right:8px;color:#a78bfa;"></i>Verification History</div>
+        <div id="integrity-history" style="font-size:0.78rem;color:#6b5fa0;">No verifications yet</div>
+      </div>
+    </div>
+
     <div class="tab-panel" id="tab-monitoring">
       <div class="cards-row">
         <div class="card">
-          <div class="card-title">CPU Usage</div>
+          <div class="card-title"><i class="fa-solid fa-microchip" style="margin-right:6px;"></i>CPU Usage</div>
           <div class="card-value" id="cpu-val">--%</div>
           <div class="bar-bg"><div class="bar-fill" id="cpu-bar" style="width:0%"></div></div>
         </div>
         <div class="card">
-          <div class="card-title">RAM Usage</div>
+          <div class="card-title"><i class="fa-solid fa-memory" style="margin-right:6px;"></i>RAM Usage</div>
           <div class="card-value" id="ram-val">--%</div>
           <div class="bar-bg"><div class="bar-fill" id="ram-bar" style="width:0%"></div></div>
         </div>
         <div class="card">
-          <div class="card-title">Disk Usage</div>
+          <div class="card-title"><i class="fa-solid fa-hard-drive" style="margin-right:6px;"></i>Disk Usage</div>
           <div class="card-value" id="disk-val">--%</div>
           <div class="bar-bg"><div class="bar-fill" id="disk-bar" style="width:0%"></div></div>
         </div>
         <div class="card">
-          <div class="card-title">Network Sent</div>
+          <div class="card-title"><i class="fa-solid fa-arrow-up-from-bracket" style="margin-right:6px;"></i>Network Sent</div>
           <div class="card-value ok" id="net-sent">-- MB</div>
-          <div style="font-size:0.72rem; color:#6b5fa0; margin-top:6px;">
-            Recv: <span id="net-recv" style="color:#818cf8">-- MB</span>
-          </div>
+          <div style="font-size:0.7rem;color:#4c3d6e;margin-top:8px;">Recv: <span id="net-recv" style="color:#818cf8;font-weight:500;">-- MB</span></div>
         </div>
         <div class="card">
-          <div class="card-title">IDS Engine</div>
+          <div class="card-title"><i class="fa-solid fa-shield-virus" style="margin-right:6px;"></i>IDS Engine</div>
           <div class="card-value ok">ACTIVE</div>
-          <div style="font-size:0.72rem; color:#6b5fa0; margin-top:6px;">Brute Force + Anomaly</div>
+          <div style="font-size:0.7rem;color:#4c3d6e;margin-top:8px;">Brute Force + Anomaly</div>
         </div>
         <div class="card">
-          <div class="card-title">Total Alerts</div>
+          <div class="card-title"><i class="fa-solid fa-bell" style="margin-right:6px;"></i>Total Alerts</div>
           <div class="card-value" id="alert-total">--</div>
-          <div style="font-size:0.72rem; margin-top:6px;">
-            <span style="color:#818cf8" id="a-info">0 info</span> &nbsp;
-            <span style="color:#f59e0b" id="a-warn">0 warn</span> &nbsp;
-            <span style="color:#f87171" id="a-crit">0 crit</span>
+          <div style="font-size:0.7rem;margin-top:8px;">
+            <span style="color:#818cf8;" id="a-info">0 info</span>&nbsp;
+            <span style="color:#f59e0b;" id="a-warn">0 warn</span>&nbsp;
+            <span style="color:#f87171;" id="a-crit">0 crit</span>
           </div>
         </div>
       </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+        <div class="panel">
+          <div class="panel-title"><i class="fa-solid fa-chart-area" style="margin-right:8px;color:#a78bfa;"></i>CPU History</div>
+          <canvas id="cpu-chart" height="110"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><i class="fa-solid fa-chart-area" style="margin-right:8px;color:#a78bfa;"></i>RAM History</div>
+          <canvas id="ram-chart" height="110"></canvas>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-title"><i class="fa-solid fa-bug" style="margin-right:8px;color:#f87171;"></i>Attack Simulation</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+          <button class="btn-primary" onclick="runSimulation('brute_force')" style="background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 4px 12px rgba(220,38,38,0.3);"><i class="fa-solid fa-key"></i> Brute Force</button>
+          <button class="btn-primary" onclick="runSimulation('cpu_stress')" style="background:linear-gradient(135deg,#d97706,#b45309);box-shadow:0 4px 12px rgba(217,119,6,0.3);"><i class="fa-solid fa-fire"></i> CPU Spike</button>
+          <button class="btn-primary" onclick="runSimulation('suspicious')" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);"><i class="fa-solid fa-user-secret"></i> Suspicious Activity</button>
+          <button class="btn-outline" onclick="clearSimLog()" style="margin-left:auto;"><i class="fa-solid fa-trash"></i> Clear</button>
+        </div>
+        <div id="sim-log" style="max-height:160px;overflow-y:auto;font-size:0.76rem;">
+          <div style="color:#4c3d6e;text-align:center;padding:14px;">No simulations run yet</div>
+        </div>
+      </div>
+
       <div class="panels-row">
         <div class="panel">
-          <div class="panel-title">Top Processes</div>
+          <div class="panel-title"><i class="fa-solid fa-list" style="margin-right:8px;color:#a78bfa;"></i>Top Processes</div>
           <div id="proc-list">Loading...</div>
         </div>
         <div class="panel">
-          <div class="panel-title">IDS — Anomaly Status</div>
+          <div class="panel-title"><i class="fa-solid fa-radar" style="margin-right:8px;color:#a78bfa;"></i>IDS Status</div>
           <div id="ids-anomaly">Loading...</div>
+          <div style="margin-top:14px;">
+            <div style="font-size:0.6rem;letter-spacing:2px;color:#6b5fa0;text-transform:uppercase;font-weight:600;margin-bottom:8px;">Blocked IPs</div>
+            <div id="ids-blocked">Loading...</div>
+          </div>
         </div>
       </div>
-      <div class="panels-row">
-        <div class="panel">
-          <div class="panel-title">IDS — Blocked IPs</div>
-          <div id="ids-blocked">Loading...</div>
-        </div>
-        <div class="panel">
-          <div class="panel-title">Recent Alerts</div>
-          <div id="alerts-list">Loading...</div>
-        </div>
+
+      <div class="panel">
+        <div class="panel-title"><i class="fa-solid fa-clock-rotate-left" style="margin-right:8px;color:#a78bfa;"></i>Recent Alerts</div>
+        <div id="alerts-list">Loading...</div>
       </div>
     </div>
 
-    <!-- ALERTS -->
     <div class="tab-panel" id="tab-alerts">
       <div class="panel" style="margin-bottom:16px;">
-        <div class="panel-title">Create Alert</div>
-        <div style="display:flex; gap:12px; align-items:center;">
-          <select id="alert-level" style="background:#13111a; border:1px solid #2d2640;
-            border-radius:6px; padding:10px; color:#e2e0e9; font-size:0.85rem; outline:none;">
+        <div class="panel-title"><i class="fa-solid fa-plus" style="margin-right:8px;color:#a78bfa;"></i>Create Alert</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <select id="alert-level" style="background:#13111a;border:1px solid rgba(124,58,237,0.2);border-radius:8px;padding:9px 12px;color:#e2e0e9;font-size:0.82rem;outline:none;font-family:'Inter',sans-serif;">
             <option value="info">Info</option>
             <option value="warning">Warning</option>
             <option value="critical">Critical</option>
           </select>
-          <input class="enc-input" id="alert-msg" type="text"
-            placeholder="Alert message..." style="flex:1; margin:0;"/>
-          <button class="btn-primary" onclick="createAlert()">Add</button>
+          <input class="enc-input" id="alert-msg" type="text" placeholder="Alert message..." style="flex:1;margin:0;"/>
+          <button class="btn-primary" onclick="createAlert()"><i class="fa-solid fa-plus"></i> Add</button>
         </div>
       </div>
+
       <div class="panel">
         <div class="panel-title">
-          All Alerts
-          <span style="float:right; display:flex; gap:6px;">
-            <button class="btn-outline" style="padding:4px 10px; font-size:0.68rem;"
-              onclick="loadAlertsTable('all')">All</button>
-            <button class="btn-outline" style="padding:4px 10px; font-size:0.68rem;"
-              onclick="loadAlertsTable('critical')">Critical</button>
-            <button class="btn-outline" style="padding:4px 10px; font-size:0.68rem;"
-              onclick="loadAlertsTable('warning')">Warning</button>
+          <span><i class="fa-solid fa-bell" style="margin-right:8px;color:#a78bfa;"></i>All Alerts</span>
+          <span style="display:flex;gap:6px;">
+            <button class="btn-outline" style="padding:3px 10px;font-size:0.66rem;" onclick="loadAlertsTable('all')">All</button>
+            <button class="btn-outline" style="padding:3px 10px;font-size:0.66rem;" onclick="loadAlertsTable('critical')">Critical</button>
+            <button class="btn-outline" style="padding:3px 10px;font-size:0.66rem;" onclick="loadAlertsTable('warning')">Warning</button>
           </span>
         </div>
         <table class="alerts-table">
-          <thead>
-            <tr><th>Level</th><th>Message</th><th>Source</th><th>Time</th><th></th></tr>
-          </thead>
-          <tbody id="alerts-tbody">
-            <tr><td colspan="5" style="color:#6b5fa0; padding:20px;">Loading...</td></tr>
-          </tbody>
+          <thead><tr><th>Level</th><th>Message</th><th>Source</th><th>Time</th><th></th></tr></thead>
+          <tbody id="alerts-tbody"><tr><td colspan="5" style="color:#4c3d6e;padding:18px;text-align:center;">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- USERS -->
     <div class="tab-panel" id="tab-users">
       <div class="panel" style="margin-bottom:16px;">
-        <div class="panel-title">Add User</div>
-        <div style="display:flex; gap:12px; align-items:center;">
-          <input class="enc-input" id="new-username" type="text"
-            placeholder="Username" style="margin:0; flex:1;"/>
-          <input class="enc-input" id="new-password" type="password"
-            placeholder="Password" style="margin:0; flex:1;"/>
-          <button class="btn-primary" onclick="addUser()">Add</button>
+        <div class="panel-title"><i class="fa-solid fa-user-plus" style="margin-right:8px;color:#a78bfa;"></i>Add User</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input class="enc-input" id="new-username" type="text" placeholder="Username" style="margin:0;flex:1;"/>
+          <input class="enc-input" id="new-password" type="password" placeholder="Password" style="margin:0;flex:1;"/>
+          <button class="btn-primary" onclick="addUser()"><i class="fa-solid fa-plus"></i> Add</button>
         </div>
         <div class="result-msg" id="user-result"></div>
       </div>
       <div class="panel">
-        <div class="panel-title">Registered Users</div>
+        <div class="panel-title"><i class="fa-solid fa-users" style="margin-right:8px;color:#a78bfa;"></i>Registered Users</div>
         <table class="users-table">
-          <thead>
-            <tr><th>ID</th><th>Username</th><th>Role</th><th>Created</th><th>Last Login</th></tr>
-          </thead>
-          <tbody id="users-tbody">
-            <tr><td colspan="5" style="color:#6b5fa0; padding:20px;">Loading...</td></tr>
-          </tbody>
+          <thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Created</th><th>Last Login</th></tr></thead>
+          <tbody id="users-tbody"><tr><td colspan="5" style="color:#4c3d6e;padding:18px;text-align:center;">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- SETTINGS -->
+    <div class="tab-panel" id="tab-logs">
+      <div class="cards-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="card"><div class="card-title">Total Logs</div><div class="card-value" id="log-total">--</div></div>
+        <div class="card"><div class="card-title">Success</div><div class="card-value ok" id="log-success">--</div></div>
+        <div class="card"><div class="card-title">Errors</div><div class="card-value critical" id="log-errors">--</div></div>
+        <div class="card"><div class="card-title">Last Activity</div><div style="font-size:0.8rem;color:#a78bfa;margin-top:8px;" id="log-last">--</div></div>
+      </div>
+
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-title"><i class="fa-solid fa-filter" style="margin-right:8px;color:#a78bfa;"></i>Filter Logs</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button class="btn-outline" style="padding:6px 12px;font-size:0.73rem;" onclick="loadLogs('all')">All</button>
+          <button class="btn-outline" style="padding:6px 12px;font-size:0.73rem;" onclick="loadLogs('auth')"><i class="fa-solid fa-lock"></i> Auth</button>
+          <button class="btn-outline" style="padding:6px 12px;font-size:0.73rem;" onclick="loadLogs('encryption')"><i class="fa-solid fa-key"></i> Encryption</button>
+          <button class="btn-outline" style="padding:6px 12px;font-size:0.73rem;" onclick="loadLogs('decryption')"><i class="fa-solid fa-unlock"></i> Decryption</button>
+          <button class="btn-outline" style="padding:6px 12px;font-size:0.73rem;" onclick="loadLogs('integrity')"><i class="fa-solid fa-fingerprint"></i> Integrity</button>
+          <button class="btn-outline" style="padding:6px 12px;font-size:0.73rem;" onclick="loadLogs('ids')"><i class="fa-solid fa-shield-virus"></i> IDS</button>
+          <button class="btn-primary" style="margin-left:auto;padding:6px 12px;background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 4px 12px rgba(220,38,38,0.2);" onclick="clearActivityLogs()"><i class="fa-solid fa-trash"></i> Clear All</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><i class="fa-solid fa-scroll" style="margin-right:8px;color:#a78bfa;"></i>Activity Log</div>
+        <div style="max-height:460px;overflow-y:auto;">
+          <table class="alerts-table" style="width:100%;">
+            <thead><tr><th>Time</th><th>Category</th><th>Action</th><th>Detail</th><th>Status</th></tr></thead>
+            <tbody id="logs-tbody"><tr><td colspan="5" style="color:#4c3d6e;padding:18px;text-align:center;">No logs yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+<!-- ══ SECURE COMM ══ -->
+<div class="tab-panel" id="tab-comm">
+
+  <!-- Status Cards -->
+  <div class="cards-row" style="grid-template-columns:repeat(3,1fr);">
+    <div class="card">
+      <div class="card-title"><i class="fa-solid fa-server" style="margin-right:6px;"></i>This Machine</div>
+      <div style="color:#a78bfa;font-weight:600;font-size:0.9rem;margin-top:6px;">192.168.216.143</div>
+      <div style="color:#4c3d6e;font-size:0.7rem;margin-top:4px;">Kali Linux</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fa-solid fa-link" style="margin-right:6px;"></i>Peer Status</div>
+      <div style="font-size:0.85rem;font-weight:600;margin-top:6px;" id="comm-peer-status">
+        <span style="color:#4c3d6e;">Not connected</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="fa-solid fa-shield-halved" style="margin-right:6px;"></i>Security</div>
+      <div style="color:#818cf8;font-weight:600;font-size:0.8rem;margin-top:6px;">RSA-2048 + AES-256-GCM</div>
+      <div style="color:#4c3d6e;font-size:0.68rem;margin-top:4px;">End-to-End Encrypted</div>
+    </div>
+  </div>
+
+  <!-- Connection -->
+  <div class="panel" style="margin-bottom:16px;">
+    <div class="panel-title"><i class="fa-solid fa-plug" style="margin-right:8px;color:#a78bfa;"></i>Connection</div>
+    <div style="display:flex;gap:10px;align-items:flex-end;">
+      <div style="flex:1;">
+        <label class="enc-label">Peer IP</label>
+        <input class="enc-input" id="comm-peer-ip" type="text" value="192.168.216.135" style="margin:0;"/>
+      </div>
+      <div style="flex:1;">
+        <label class="enc-label">Your Name</label>
+        <input class="enc-input" id="comm-sender-name" type="text" value="Kali" style="margin:0;"/>
+      </div>
+      <button class="btn-primary" onclick="connectToPeer()"><i class="fa-solid fa-plug"></i> Connect</button>
+      <button class="btn-outline" onclick="generateCommKeys()"><i class="fa-solid fa-key"></i> Gen Keys</button>
+    </div>
+    <div class="result-msg" id="comm-connect-result"></div>
+  </div>
+
+  <!-- Main Area -->
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;">
+
+    <!-- Chat -->
+    <div class="panel">
+      <div class="panel-title"><i class="fa-solid fa-comments" style="margin-right:8px;color:#a78bfa;"></i>Encrypted Chat</div>
+
+      <!-- Messages -->
+      <div id="comm-messages" style="height:300px;overflow-y:auto;margin-bottom:12px;
+        background:rgba(15,13,23,0.6);border-radius:10px;padding:14px;
+        border:1px solid rgba(124,58,237,0.08);">
+        <div style="text-align:center;color:#4c3d6e;padding:40px 20px;">
+          <i class="fa-solid fa-lock" style="font-size:1.5rem;margin-bottom:8px;display:block;opacity:0.3;"></i>
+          All messages are end-to-end encrypted
+        </div>
+      </div>
+
+      <!-- Locked message unlock -->
+      <div id="unlock-panel" style="display:none;background:rgba(245,158,11,0.06);
+        border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:0.75rem;color:#f59e0b;margin-bottom:8px;">
+          <i class="fa-solid fa-lock" style="margin-right:6px;"></i>
+          Password-protected message received — enter key to unlock
+        </div>
+        <div style="display:flex;gap:8px;">
+          <input class="enc-input" id="unlock-password" type="password"
+            placeholder="Enter message password" style="margin:0;flex:1;"/>
+          <button class="btn-primary" style="padding:9px 14px;" onclick="unlockMessage()">
+            <i class="fa-solid fa-unlock"></i> Unlock
+          </button>
+        </div>
+        <div class="result-msg" id="unlock-result"></div>
+      </div>
+
+      <!-- Input -->
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input class="enc-input" id="comm-message-input" type="text"
+          placeholder="Type message..." style="margin:0;flex:1;"
+          onkeypress="if(event.key==='Enter')sendMessage()"/>
+        <button class="btn-primary" onclick="sendMessage()">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+
+      <!-- Password for outgoing -->
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" id="use-msg-password" style="accent-color:#7c3aed;"
+          onchange="document.getElementById('msg-password-field').style.display=this.checked?'flex':'none'"/>
+        <label for="use-msg-password" style="font-size:0.74rem;color:#6b5fa0;cursor:pointer;">
+          <i class="fa-solid fa-lock" style="margin-right:4px;color:#f59e0b;"></i>
+          Password-protect this message
+        </label>
+      </div>
+      <div id="msg-password-field" style="display:none;gap:8px;margin-top:8px;">
+        <input class="enc-input" id="comm-msg-password" type="password"
+          placeholder="Enter access password for receiver" style="margin:0;flex:1;"/>
+      </div>
+      <div class="result-msg" id="comm-msg-result"></div>
+    </div>
+
+    <!-- File Transfer + Info -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <!-- File Send -->
+      <div class="panel">
+        <div class="panel-title"><i class="fa-solid fa-file-export" style="margin-right:8px;color:#a78bfa;"></i>Send File</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input class="enc-input" id="comm-file-path" type="text"
+            placeholder="Select file" style="margin:0;flex:1;font-size:0.76rem;"/>
+          <button class="btn-outline" style="padding:9px 10px;" onclick="browseFile('comm-file-path')">
+            <i class="fa-solid fa-folder-open"></i>
+          </button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <input type="checkbox" id="use-file-password" style="accent-color:#7c3aed;"
+            onchange="document.getElementById('file-password-field').style.display=this.checked?'block':'none'"/>
+          <label for="use-file-password" style="font-size:0.72rem;color:#6b5fa0;cursor:pointer;">
+            <i class="fa-solid fa-lock" style="color:#f59e0b;margin-right:4px;"></i>Password-protect
+          </label>
+        </div>
+        <div id="file-password-field" style="display:none;margin-bottom:10px;">
+          <input class="enc-input" id="comm-file-password" type="password"
+            placeholder="File access password" style="margin:0;"/>
+        </div>
+        <button class="btn-primary" onclick="sendFile()" style="width:100%;">
+          <i class="fa-solid fa-file-export"></i> Send Encrypted
+        </button>
+        <div class="result-msg" id="comm-file-result"></div>
+      </div>
+
+      <!-- Received Files -->
+      <div class="panel">
+        <div class="panel-title"><i class="fa-solid fa-file-import" style="margin-right:8px;color:#a78bfa;"></i>Received Files</div>
+        <div id="comm-received-files" style="font-size:0.76rem;color:#4c3d6e;max-height:120px;overflow-y:auto;">
+          No files received
+        </div>
+      </div>
+
+      <!-- Security Info -->
+      <div class="panel">
+        <div class="panel-title"><i class="fa-solid fa-shield-halved" style="margin-right:8px;color:#a78bfa;"></i>How it Works</div>
+        <div style="font-size:0.72rem;color:#6b5fa0;line-height:2;">
+          <div><i class="fa-solid fa-check" style="color:#818cf8;margin-right:6px;"></i>RSA-2048 key exchange</div>
+          <div><i class="fa-solid fa-check" style="color:#818cf8;margin-right:6px;"></i>AES-256-GCM encryption</div>
+          <div><i class="fa-solid fa-check" style="color:#818cf8;margin-right:6px;"></i>SHA-256 integrity check</div>
+          <div><i class="fa-solid fa-lock" style="color:#f59e0b;margin-right:6px;"></i>Optional password lock</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
     <div class="tab-panel" id="tab-settings">
       <div class="panel">
-        <div class="panel-title">Application Settings</div>
+        <div class="panel-title"><i class="fa-solid fa-gear" style="margin-right:8px;color:#a78bfa;"></i>Application Settings</div>
         <div class="settings-group">
           <span class="settings-label">Appearance</span>
           <div class="settings-row">
             <span>Theme</span>
-            <div style="display:flex; gap:8px;">
-              <button class="btn-outline" style="padding:6px 14px; font-size:0.72rem;"
-                onclick="setTheme('dark')">Dark</button>
-              <button class="btn-outline" style="padding:6px 14px; font-size:0.72rem;"
-                onclick="setTheme('light')">Light</button>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-outline" style="padding:5px 14px;font-size:0.7rem;" onclick="setTheme('dark')"><i class="fa-solid fa-moon"></i> Dark</button>
+              <button class="btn-outline" style="padding:5px 14px;font-size:0.7rem;" onclick="setTheme('light')"><i class="fa-solid fa-sun"></i> Light</button>
             </div>
           </div>
         </div>
+
         <div class="settings-group">
           <span class="settings-label">Detection Thresholds</span>
           <div class="settings-row"><span>Brute Force Threshold</span><span class="settings-val">5 attempts / 60s</span></div>
@@ -452,19 +682,20 @@
           <div class="settings-row"><span>CPU Anomaly Threshold</span><span class="settings-val">85%</span></div>
           <div class="settings-row"><span>RAM Anomaly Threshold</span><span class="settings-val">85%</span></div>
         </div>
+
         <div class="settings-group">
           <span class="settings-label">System Info</span>
           <div class="settings-row"><span>Application</span><span class="settings-val">SentraGuard v1.0</span></div>
           <div class="settings-row"><span>Backend</span><span class="settings-val">Flask + SQLite</span></div>
           <div class="settings-row"><span>Encryption</span><span class="settings-val">AES-256-GCM</span></div>
-          <div class="settings-row"><span>Refresh Rate</span><span class="settings-val">5 seconds</span></div>
+          <div class="settings-row"><span>Refresh Rate</span><span class="settings-val">Every 5 seconds</span></div>
         </div>
+
         <div class="settings-group">
           <span class="settings-label">Danger Zone</span>
           <div class="settings-row">
             <span>Clear All Alerts</span>
-            <button class="btn-outline" style="padding:6px 14px; font-size:0.72rem;"
-              onclick="clearAlerts()">Clear</button>
+            <button class="btn-outline" style="padding:5px 14px;font-size:0.7rem;border-color:rgba(248,113,113,0.3);color:#f87171;" onclick="clearAlerts()"><i class="fa-solid fa-trash"></i> Clear</button>
           </div>
         </div>
       </div>
@@ -473,39 +704,70 @@
   </div>
 </div>
 
-<script>
-  function setTheme(mode) {
-    if (mode === 'light') {
-      document.body.classList.add('light');
-      localStorage.setItem('sg-theme', 'light');
-    } else {
-      document.body.classList.remove('light');
-      localStorage.setItem('sg-theme', 'dark');
-    }
-  }
-  (function() {
-    if (localStorage.getItem('sg-theme') === 'light') document.body.classList.add('light');
-  })();
+<div class="modal-overlay" id="vault-retrieve-modal">
+  <div class="modal-box">
+    <div class="modal-title"><i class="fa-solid fa-download" style="margin-right:10px;color:#a78bfa;"></i>Retrieve File from Vault</div>
+    <label class="enc-label">Output Directory</label>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input class="enc-input" id="retrieve-output-dir" type="text" placeholder="/home/imane/Downloads" style="margin:0;flex:1;" value="/tmp"/>
+      <button class="btn-outline" style="padding:9px 12px;" onclick="browseRetrieveDir()"><i class="fa-solid fa-folder-open"></i></button>
+    </div>
+    <label class="enc-label">Password (if protected)</label>
+    <input class="enc-input" id="retrieve-password" type="password" placeholder="Leave blank if not protected"/>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn-primary" onclick="confirmRetrieve()" style="flex:1;"><i class="fa-solid fa-download"></i> Retrieve</button>
+      <button class="btn-outline" onclick="closeRetrieveModal()" style="flex:1;">Cancel</button>
+    </div>
+    <div class="result-msg" id="retrieve-result"></div>
+  </div>
+</div>
 
-  function switchTab(name) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    const titles = {
-      encryption: 'Encryption', monitoring: 'Monitoring',
-      alerts: 'Alerts', users: 'Users', settings: 'Settings'
-    };
-    document.getElementById('topbar-title').textContent = titles[name] || name;
-    document.querySelectorAll('.nav-item').forEach(n => {
-      if ((n.getAttribute('onclick') || '').includes("'" + name + "'")) {
-        n.classList.add('active');
-      }
-    });
-    if (name === 'alerts') loadAlertsTable('all');
-    if (name === 'users') loadUsers();
-    if (name === 'monitoring') refresh();
+<script>
+function setTheme(mode){
+  if(mode==='light'){
+    document.body.classList.add('light');
+  }else{
+    document.body.classList.remove('light');
   }
+  document.cookie='sg-theme='+mode+';path=/;max-age=31536000';
+  try{localStorage.setItem('sg-theme',mode);}catch(e){}
+  fetch('/api/theme',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({theme:mode})});
+}
+
+(function(){
+  // Try cookie first
+  function getCookie(n){const m=document.cookie.match(new RegExp('(^| )'+n+'=([^;]+)'));return m?m[2]:null;}
+  let theme=getCookie('sg-theme');
+  // Fallback to localStorage
+  if(!theme){try{theme=localStorage.getItem('sg-theme');}catch(e){}}
+  // Fallback to server
+  if(!theme){
+    fetch('/api/theme').then(r=>r.json()).then(d=>{
+      if(d.theme==='light')document.body.classList.add('light');
+    }).catch(()=>{});
+    return;
+  }
+  if(theme==='light')document.body.classList.add('light');
+})();
+
+  function switchTab(name,el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const panel=document.getElementById('tab-'+name);
+  if(panel)panel.classList.add('active');
+  if(el)el.classList.add('active');
+  const tabTitles={encryption:'Encryption',vault:'Secure Vault',integrity:'File Integrity',monitoring:'Monitoring',alerts:'Alerts',users:'Users',logs:'Activity Logs',settings:'Settings',comm:'Secure Communication'};
+  document.getElementById('topbar-title').textContent=tabTitles[name]||name;
+  if(name==='alerts'&&typeof loadAlertsTable==='function')loadAlertsTable('all');
+  if(name==='users'&&typeof loadUsers==='function')loadUsers();
+  if(name==='monitoring'){if(typeof initCharts==='function')initCharts(); if(typeof refresh==='function')refresh();}
+  if(name==='logs'&&typeof loadLogs==='function')loadLogs('all');
+  if(name==='vault'&&typeof loadVault==='function')loadVault();
+  if(name==='comm') loadCommHistory();
+}
 </script>
+
 <script src="/static/dashboard.js"></script>
 <script src="/static/encryption.js"></script>
 </body>

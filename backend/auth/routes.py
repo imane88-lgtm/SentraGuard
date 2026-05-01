@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from backend.auth.models import db, User
 from backend.ids.brute_force import record_failed_attempt, check_brute_force
+from backend.logs.activity import log
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -11,17 +12,17 @@ def register():
     data = request.get_json()
     username = data.get('username', '').strip()
     password = data.get('password', '')
-
     if len(username) < 3 or len(password) < 6:
+        log('auth', 'register_failed', f'Invalid input for {username}', 'error')
         return jsonify({'error': 'Username min 3 chars, password min 6'}), 400
-
     if User.query.filter_by(username=username).first():
+        log('auth', 'register_failed', f'Duplicate username: {username}', 'error')
         return jsonify({'error': 'User already exists'}), 409
-
     hashed = generate_password_hash(password)
     user = User(username=username, password_hash=hashed)
     db.session.add(user)
     db.session.commit()
+    log('auth', 'register', f'New user registered: {username}')
     return jsonify({'message': f'User {username} registered successfully'}), 201
 
 @auth_bp.route('/api/login', methods=['POST'])
@@ -29,32 +30,29 @@ def login():
     ip = request.remote_addr
     bf = check_brute_force(ip)
     if bf['status'] == 'blocked':
+        log('ids', 'brute_force_block', f'IP {ip} blocked', 'error')
         return jsonify({'error': 'Too many failed attempts', 'detail': bf}), 429
-
     data = request.get_json()
     username = data.get('username', '').strip()
     password = data.get('password', '')
     user = User.query.filter_by(username=username).first()
-
     if not user or not check_password_hash(user.password_hash, password):
         record_failed_attempt(ip)
         bf = check_brute_force(ip)
+        log('auth', 'login_failed', f'Failed login for {username} from {ip}', 'error')
         return jsonify({'error': 'Invalid credentials', 'detail': bf}), 401
-
     user.last_login = datetime.utcnow()
     db.session.commit()
-
     session['user'] = user.username
     session['role'] = user.role
-
-    return jsonify({
-        'message': 'Login successful',
-        'username': user.username,
-        'role': user.role
-    }), 200
+    log('auth', 'login_success', f'User {username} logged in from {ip}')
+    return jsonify({'message': 'Login successful',
+                    'username': user.username, 'role': user.role}), 200
 
 @auth_bp.route('/api/logout', methods=['POST'])
 def logout():
+    user = session.get('user', 'unknown')
+    log('auth', 'logout', f'User {user} logged out')
     session.clear()
     return jsonify({'message': 'Logged out'}), 200
 

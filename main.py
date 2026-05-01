@@ -4,7 +4,8 @@ from app import app
 
 def run_flask():
     app.run(port=5000, debug=False, use_reloader=False)
-
+def run_flask():
+    app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 def main():
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()

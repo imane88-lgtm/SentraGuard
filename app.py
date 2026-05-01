@@ -9,6 +9,10 @@ from backend.monitoring.routes import mon_bp
 from backend.ids.routes import ids_bp
 from backend.alerts.routes import alerts_bp
 from backend.auth.user_routes import users_bp
+from backend.logs.routes import logs_bp
+from backend.vault.routes import vault_bp
+from backend.comm.routes import comm_bp
+from flask import make_response
 
 app = Flask(__name__,
     template_folder='frontend/templates',
@@ -22,6 +26,9 @@ app.register_blueprint(mon_bp)
 app.register_blueprint(ids_bp)
 app.register_blueprint(alerts_bp)
 app.register_blueprint(users_bp)
+app.register_blueprint(logs_bp)
+app.register_blueprint(vault_bp)
+app.register_blueprint(comm_bp)
 
 @app.route('/')
 def index():
@@ -46,9 +53,24 @@ def pick_file():
         return jsonify({'path': path}), 200
     return jsonify({'error': 'No file selected'}), 204
 
+@app.route('/api/theme', methods=['POST'])
+def set_theme():
+    data  = request.get_json()
+    theme = data.get('theme', 'dark')
+    resp  = make_response(jsonify({'message': 'Theme set'}))
+    resp.set_cookie('sg-theme', theme, max_age=31536000)
+    return resp
+
+@app.route('/api/theme', methods=['GET'])
+def get_theme():
+    theme = request.cookies.get('sg-theme', 'dark')
+    return jsonify({'theme': theme}), 200
+
+
 with app.app_context():
     db.create_all()
     print("[OK] Database ready")
 
 if __name__ == '__main__':
     app.run(debug=True)
+
