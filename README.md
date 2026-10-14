@@ -206,5 +206,3 @@ Le projet **ne constitue pas** une expérience d'exploitation d'un SOC d'entrepr
 **Imane Mrino** — Étudiante en Réseaux, Cloud et Cybersécurité · Orientation SOC / Blue Team
 
 [GitHub](https://github.com/imane88-lgtm) · [LinkedIn](https://www.linkedin.com/in/imane-mrino-899749373/) · [Portfolio](https://imane-mrino-portfolio.argus-codex-ai.chatgpt.site/)
-
-> **Publication et attribution.** Avant de diffuser des portions de code issues d'un stage, vérifier les droits et identifier clairement les contributions d'autres personnes. Aucun environnement réel ne doit être scanné ou modifié sans autorisation préalable.
