@@ -10,9 +10,6 @@
 
 </div>
 
----
-
-> **Statut : prototype pédagogique local, non durci pour la production.** La base de code implémente des modules de supervision et de sécurité, mais présente des points à corriger avant toute démonstration ouverte ou utilisation avec de vraies données sensibles.
 
 ## 01 — Présentation
 
