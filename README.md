@@ -46,7 +46,7 @@ C'est un **prototype d'apprentissage** : il ne remplace ni un SIEM, ni un EDR, n
 
 ## 03 — Architecture
 
-![Architecture de SentraGuard](architecture.svg)
+![Architecture de SentraGuard](architecture (1).svg)
 
 Le backend Flask distribue ses routes en *blueprints* pour l'authentification, le monitoring, les alertes, l'IDS et le chiffrement. La couche de persistance repose sur SQLAlchemy et SQLite ; plusieurs états de détection restent toutefois **en mémoire** et disparaissent au redémarrage.
 
