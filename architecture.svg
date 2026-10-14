@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="360" viewBox="0 0 1500 360" role="img" aria-label="smart_netsec — architecture logique">
+<defs><linearGradient id="back" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#061020"/><stop offset="1" stop-color="#0b1c37"/></linearGradient><linearGradient id="node" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#102448"/><stop offset="1" stop-color="#0a1630"/></linearGradient><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#60a5fa"/></marker></defs>
+<rect x="1" y="1" width="1498" height="358" rx="22" fill="url(#back)" stroke="#244b83"/>
+<text x="38" y="52" font-family="Arial, sans-serif" font-size="29" font-weight="700" fill="#eef6ff">smart_netsec — architecture logique</text>
+<text x="38" y="85" font-family="Arial, sans-serif" font-size="17" fill="#a5c6f5">Du réseau autorisé à la restitution des résultats</text>
+<line x1="260" y1="213" x2="328" y2="213" stroke="#60a5fa" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="560" y1="213" x2="628" y2="213" stroke="#60a5fa" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="860" y1="213" x2="928" y2="213" stroke="#60a5fa" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="1160" y1="213" x2="1228" y2="213" stroke="#60a5fa" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="40" y="130" width="222" height="171" rx="20" fill="url(#node)" stroke="#376db8" stroke-width="1.5"/>
+<rect x="58" y="147" width="40" height="4" rx="2" fill="#60a5fa"/>
+<text x="58" y="178" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">Réseau de</text>
+<text x="58" y="203" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">test</text>
+<text x="58" y="230" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">Machines et services</text>
+<text x="58" y="250" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">autorisés</text>
+<rect x="340" y="130" width="222" height="171" rx="20" fill="url(#node)" stroke="#376db8" stroke-width="1.5"/>
+<rect x="358" y="147" width="40" height="4" rx="2" fill="#60a5fa"/>
+<text x="358" y="178" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">Scanner /</text>
+<text x="358" y="203" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">Nmap</text>
+<text x="358" y="230" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">Découverte et</text>
+<text x="358" y="250" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">services exposés</text>
+<rect x="640" y="130" width="222" height="171" rx="20" fill="url(#node)" stroke="#376db8" stroke-width="1.5"/>
+<rect x="658" y="147" width="40" height="4" rx="2" fill="#60a5fa"/>
+<text x="658" y="178" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">Évaluation /</text>
+<text x="658" y="203" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">scoring</text>
+<text x="658" y="230" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">Qualification et</text>
+<text x="658" y="250" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">persistance</text>
+<rect x="940" y="130" width="222" height="171" rx="20" fill="url(#node)" stroke="#376db8" stroke-width="1.5"/>
+<rect x="958" y="147" width="40" height="4" rx="2" fill="#60a5fa"/>
+<text x="958" y="178" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">Services /</text>
+<text x="958" y="203" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">SQLite</text>
+<text x="958" y="230" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">Inventaire, scans,</text>
+<text x="958" y="250" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">logs et alertes IDS</text>
+<rect x="1240" y="130" width="222" height="171" rx="20" fill="url(#node)" stroke="#376db8" stroke-width="1.5"/>
+<rect x="1258" y="147" width="40" height="4" rx="2" fill="#60a5fa"/>
+<text x="1258" y="178" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">Flask /</text>
+<text x="1258" y="203" font-family="Arial, sans-serif" font-weight="700" font-size="19" fill="#fff">dashboard</text>
+<text x="1258" y="230" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">Consultation,</text>
+<text x="1258" y="250" font-family="Arial, sans-serif" font-size="15" fill="#aac5e6">rapports, supervision</text>
+<text x="38" y="335" font-family="Arial, sans-serif" font-size="14" fill="#9bbce4">Schéma conceptuel basé sur les modules du dépôt — n’atteste pas du fonctionnement intégral.</text></svg>
