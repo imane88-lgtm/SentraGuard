@@ -46,7 +46,7 @@ C'est un **prototype d'apprentissage** : il ne remplace ni un SIEM, ni un EDR, n
 
 ## 03 — Architecture
 
-![Architecture de SentraGuard](architecture (1).svg)
+![Architecture de SentraGuard](architecture(1).svg)
 
 Le backend Flask distribue ses routes en *blueprints* pour l'authentification, le monitoring, les alertes, l'IDS et le chiffrement. La couche de persistance repose sur SQLAlchemy et SQLite ; plusieurs états de détection restent toutefois **en mémoire** et disparaissent au redémarrage.
 
@@ -195,6 +195,4 @@ Ce projet **ne prétend pas démontrer** l'exploitation d'un SIEM Wazuh, une cor
 **Imane Mrino** — Étudiante en Réseaux, Cloud et Cybersécurité · Orientation SOC / Blue Team
 
 [GitHub](https://github.com/imane88-lgtm) · [LinkedIn](https://www.linkedin.com/in/imane-mrino-899749373/) · [Portfolio](https://imane-mrino-portfolio.argus-codex-ai.chatgpt.site/)
-
-> Projet à vocation pédagogique. Toutes les simulations doivent rester dans un environnement contrôlé avec données fictives. La sécurité réelle du logiciel dépend des corrections, de la configuration, des tests et des revues de code.
 
